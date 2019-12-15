@@ -19,6 +19,8 @@ See training and test tips at: https://github.com/junyanz/pytorch-CycleGAN-and-p
 See frequently asked questions at: https://github.com/junyanz/pytorch-CycleGAN-and-pix2pix/blob/master/docs/qa.md
 """
 import time
+import numpy as np
+import os
 from options.train_options import TrainOptions
 from data import create_dataset
 from models import create_model
@@ -35,6 +37,12 @@ if __name__ == '__main__':
     visualizer = Visualizer(opt)   # create a visualizer that display/save images and plots
     total_iters = 0                # the total number of training iterations
     print("begin training")
+    # Addition to track training losses
+    training_losses = []
+    if os.path.isdir("losses_checkpoints") == False:
+        os.mkdir('losses_checkpoints')
+    losses_store_name = 'losses_checkpoints/' + opt.name
+    os.mkdir(losses_store_name)
     #print(opt.epoch_count, opt.niter + opt.niter_decay + 1)
 
     for epoch in range(opt.epoch_count, opt.niter + opt.niter_decay + 1):    # outer loop for different epochs; we save the model by <epoch_count>, <epoch_count>+<save_latest_freq>
@@ -60,7 +68,9 @@ if __name__ == '__main__':
 
             if total_iters % opt.print_freq == 0:    # print training losses and save logging information to the disk
                 losses = model.get_current_losses()
-                print(losses)
+                training_losses.append(losses) 
+                training_losses_arr = np.asarray(training_losses)
+                np.save(losses_store_name + '/' + 'iter_%d' % total_iters, training_losses_arr)
                 t_comp = (time.time() - iter_start_time) / opt.batch_size
                 visualizer.print_current_losses(epoch, epoch_iter, losses, t_comp, t_data)
                 if opt.display_id > 0:
@@ -68,9 +78,10 @@ if __name__ == '__main__':
 
             if total_iters % opt.save_latest_freq == 0:   # cache our latest model every <save_latest_freq> iterations
                 print('saving the latest model (epoch %d, total_iters %d)' % (epoch, total_iters))
+                print('saving the latest training losses (epoch %d, total_iters %d)' % (epoch, total_iters))
                 save_suffix = 'iter_%d' % total_iters if opt.save_by_iter else 'latest'
                 model.save_networks(save_suffix)
-
+                
             iter_data_time = time.time()
         if epoch % opt.save_epoch_freq == 0:              # cache our model every <save_epoch_freq> epochs
             print('saving the model at the end of epoch %d, iters %d' % (epoch, total_iters))
