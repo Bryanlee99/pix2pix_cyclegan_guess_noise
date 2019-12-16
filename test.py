@@ -54,6 +54,18 @@ if __name__ == '__main__':
     if opt.eval:
         model.eval()
     for i, data in enumerate(dataset):
+        # Bryan: Added additional 0 dimension to the data matrix
+        if opt.four_dim_defense == 1:
+            import torch
+            A_size = data['A'].size()
+            zeros_A = torch.zeros([1, 1, A_size[2], A_size[3]], dtype=torch.float)
+            concat_A = torch.cat([data['A'], zeros_A], dim=1)
+            data['A'] = concat_A
+
+            B_size = data['B'].size()
+            zeros_B = torch.zeros([1, 1, B_size[2], B_size[3]], dtype=torch.float)
+            concat_B = torch.cat([data['B'], zeros_B], dim=1)
+            data['B'] = concat_B
         if i >= opt.num_test:  # only apply our model to opt.num_test images.
             break
         model.set_input(data)  # unpack data from data loader

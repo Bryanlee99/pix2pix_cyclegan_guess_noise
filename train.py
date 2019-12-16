@@ -42,7 +42,8 @@ if __name__ == '__main__':
     if os.path.isdir("losses_checkpoints") == False:
         os.mkdir('losses_checkpoints')
     losses_store_name = 'losses_checkpoints/' + opt.name
-    os.mkdir(losses_store_name)
+    if os.path.isdir(losses_store_name) == False:
+        os.mkdir(losses_store_name)
     #print(opt.epoch_count, opt.niter + opt.niter_decay + 1)
 
     for epoch in range(opt.epoch_count, opt.niter + opt.niter_decay + 1):    # outer loop for different epochs; we save the model by <epoch_count>, <epoch_count>+<save_latest_freq>
@@ -58,6 +59,20 @@ if __name__ == '__main__':
             visualizer.reset()
             total_iters += opt.batch_size
             epoch_iter += opt.batch_size
+            
+            # Bryan: Added additional 0 dimension to the data matrix
+            if opt.four_dim_defense == 1:
+                import torch
+                A_size = data['A'].size()
+                zeros_A = torch.zeros([1, 1, A_size[2], A_size[3]], dtype=torch.float)
+                concat_A = torch.cat([data['A'], zeros_A], dim=1)
+                data['A'] = concat_A
+
+                B_size = data['B'].size()
+                zeros_B = torch.zeros([1, 1, B_size[2], B_size[3]], dtype=torch.float)
+                concat_B = torch.cat([data['B'], zeros_B], dim=1)
+                data['B'] = concat_B
+            
             model.set_input(data)         # unpack data from dataset and apply preprocessing
             model.optimize_parameters()   # calculate loss functions, get gradients, update network weights
 

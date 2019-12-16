@@ -17,6 +17,8 @@ class TestOptions(BaseOptions):
         parser.add_argument('--eval', action='store_true', help='use eval mode during test time.')
         parser.add_argument('--num_test', type=int, default=50, help='how many test images to run')
         parser.add_argument('--accuracy_file', type=str, default='./accuracy_files', help='models are saved here')
+        parser.add_argument('--four_dim_defense', type=int, default=0, help='use the addition of fourth dimension to the image [no-0 | yes-1]')
+
         # rewrite devalue values
         parser.set_defaults(model='test')
         # To avoid cropping, the load_size should be the same as crop_size

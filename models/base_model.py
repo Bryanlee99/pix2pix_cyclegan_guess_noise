@@ -126,6 +126,20 @@ class BaseModel(ABC):
         for name in self.visual_names:
             if isinstance(name, str):
                 visual_ret[name] = getattr(self, name)
+                if self.opt.four_dim_defense == 1:
+    #                 # Bryan addition: matrix defense technique
+                    if self.opt.input_nc > 3:
+                        import matplotlib.pyplot as plt
+                        import numpy as np
+                        if name in ['fake_B', 'fake_A']:
+                            l = visual_ret[name][:, 3, :, :].detach().cpu().numpy().reshape(256, 256)
+                            arr_l = np.asarray(l)
+                            arr_l = (arr_l + 1)/2
+                            arr_l.reshape(256, 256)
+                            print(arr_l)           
+                            plt.imsave(name + '_noise.png', arr_l, cmap='gray')
+                            # visual_ret['Noise A'] = visual_ret[name][:, 3, :, :]
+                        visual_ret[name] = visual_ret[name][:, 0:3, :, :]
         return visual_ret
 
     def get_current_losses(self):
