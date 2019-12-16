@@ -130,3 +130,17 @@ IoU Accuracy:  0.05683988524012597 +- 0.029847738085695717
 IoU (Grayscale) Accuracy:  0.005551092253788764 +- 0.0037335995611995315
 SN evaluated at default sigma: 48.95911211464128 +- 7.722919731887159
 SN (Grayscale) evaluated at default sigma: 27.99244586228173 +- 4.470486584559908
+
+AgB_r2
+Images were normalized.
+
+RH Score:  2.784172294095735
+RH (Grayscale) Score:  -1.62354325653099
+Proposed RH Score:  38.19566692302304
+Proposed RH (Grayscale) Score:  -22.133202775844133
+Segmentation Accuracy:  0.4874643164833315
+Segmentation (Grayscale) Accuracy:  0.2738435255373762
+IoU Accuracy:  0.06107872238812505
+IoU (Grayscale) Accuracy:  0.006378970089156454
+SN evaluated at default sigma: 47.57183914935725
+SN (Grayscale) evaluated at default sigma: 27.206764554292118
