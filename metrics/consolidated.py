@@ -8,11 +8,15 @@ quantizations = 50                                  # Number of even quantizatio
 IMG_BATCH_SIZE = 14
 # palette_quantization = False # Palette quantization strategy - unused
 
-# Two metrics: Segmentation accuracy and IoU accuracy
-seg_scores = []
-iou_scores = []
-seg_grayscale_scores = []
-iou_grayscale_scores = []
+## Metrics
+rh_scores = []                    # RH
+rh_grayscale_scores = []          # RH (Grayscale)
+proposed_rh_scores = []           # Proposed RH
+proposed_rh_grayscale_scores = [] # Proposed RH (Grayscale)
+seg_scores = []                   # Segmentation Accuracy
+seg_grayscale_scores = []         # Segmentation Accuracy (Grayscale)
+iou_scores = []                   # IoU
+iou_grayscale_scores = []         # IoU (Grayscale)
 
 # Collect image file names from IMG_DIR_PATH
 walk_dir_obj = os.walk(IMG_DIR_PATH)
@@ -23,11 +27,10 @@ if '.DS_Store' in image_files:
 
 # Calculate metric for each image. Image sets come in batches of IMG_BATCH_SIZE files
 for i in range(0, len(image_files), IMG_BATCH_SIZE):
-  ## (A) Prepare Images
+  ### (A) Prepare Images
   # Collect image names by A/B category
   imagesA, imagesB = [], []
   for j in range(0, IMG_BATCH_SIZE, 2):
-    print(image_files[i + j])
     imagesA.append(image_files[i + j])
   for j in range(1, IMG_BATCH_SIZE, 2):
     imagesB.append(image_files[i + j])
@@ -57,6 +60,10 @@ for i in range(0, len(image_files), IMG_BATCH_SIZE):
       imagesA[i] = imagesA[i]/255.0
     for i in range(len(imagesB)):
       imagesB[i] = imagesB[i]/255.0
+    for i in range(len(gimagesA)):
+      gimagesA[i] = gimagesA[i]/255.0
+    for i in range(len(gimagesB)):
+      gimagesB[i] = gimagesB[i]/255.0
 
   # Unpack images
   fakeA, qefakeA, qerealA, realA, recA, qerecA, snrecA = imagesA
@@ -66,13 +73,37 @@ for i in range(0, len(image_files), IMG_BATCH_SIZE):
   gfakeA, gqefakeA, gqerealA, grealA, grecA, gqerecA, gsnrecA = gimagesA
   gfakeB, gqefakeB, gqerealB, grealB, grecB, gqerecB, gsnrecB = gimagesB
 
-  ## (B) Calculate metrics
-  ## RGB
-  # Segmentation Accuracy
+  ### (B) Calculate metrics
+
+  ## (B1) RH
+  # RGB
+  rec_loss = np.linalg.norm(recA - realA)    # Normal reconstruction loss of real image (from richer domain)
+  qrec_loss = np.linalg.norm(qerecA - realA) # Reconstruction loss using quantized intermediary
+  rh_scores.append(rec_loss - qrec_loss)
+  # Grayscale
+  grec_loss = np.linalg.norm(grecA - grealA)    # Normal reconstruction loss of real image (from richer domain)
+  gqrec_loss = np.linalg.norm(gqerecA - grealA) # Reconstruction loss using quantized intermediary
+  rh_grayscale_scores.append(grec_loss - gqrec_loss)
+
+  ## (B2) Proposed RH
+  # RGB
+  trans_loss = np.linalg.norm(fakeA - realA) # Translation loss from one-to-many (input map from poorer domain)
+  proposed_rh_scores.append(rec_loss - trans_loss)
+
+  # Grayscale
+  gtrans_loss = np.linalg.norm(gfakeA - grealA) # Translation loss from one-to-many (input map from poorer domain)
+  proposed_rh_grayscale_scores.append(grec_loss - gtrans_loss)
+
+  ## (B3) Segmentation Accuracy
+  # RGB
   seg_acc = np.mean(qefakeB == qerealB)
   seg_scores.append(seg_acc)
+  # Grayscale
+  gseg_acc = np.mean(gqefakeB == gqerealB)
+  seg_grayscale_scores.append(gseg_acc)
 
-  # IoU Accuracy
+  ## (B4) IoU Accuracy
+  # RGB
   ious = []
   segments = np.unique(qerealB)
   # if palette_quantization:
@@ -92,12 +123,7 @@ for i in range(0, len(image_files), IMG_BATCH_SIZE):
     ious.append(intersection / union)
   iou_scores.append(np.array(ious).mean())
 
-  ## Grayscale
-  # Segmentation Accuracy
-  gseg_acc = np.mean(gqefakeB == gqerealB) # Segmentation Accuracy
-  seg_grayscale_scores.append(gseg_acc)
-
-  # IoU Accuracy
+  # Grayscale
   gious = []
   gray_segments = np.unique(gqerealB)
   # if palette_quantization:
@@ -109,11 +135,24 @@ for i in range(0, len(image_files), IMG_BATCH_SIZE):
   iou_grayscale_scores.append(np.array(gious).mean())
 
 ## Print scores
+print('Images were', 'not' if not normalize else '\b', 'normalized.\n')
+
+rh_scores = np.array(rh_scores)
+rh_grayscale_scores = np.array(rh_grayscale_scores)
+print('RH Score: ', rh_scores.mean())
+print('RH (Grayscale) Score: ', rh_grayscale_scores.mean())
+
+proposed_rh_scores = np.array(proposed_rh_scores)
+proposed_rh_grayscale_scores = np.array(proposed_rh_grayscale_scores)
+print('Proposed RH Score: ', proposed_rh_scores.mean())
+print('Proposed RH (Grayscale) Score: ', proposed_rh_grayscale_scores.mean())
+
 seg_scores = np.array(seg_scores)
-iou_scores = np.array(iou_scores)
 seg_grayscale_scores = np.array(seg_grayscale_scores)
-iou_grayscale_scores = np.array(iou_grayscale_scores)
 print('Segmentation Accuracy: ', seg_scores.mean())
-print('IoU Accuracy: ', iou_scores.mean())
 print('Segmentation (Grayscale) Accuracy: ', seg_grayscale_scores.mean())
+
+iou_scores = np.array(iou_scores)
+iou_grayscale_scores = np.array(iou_grayscale_scores)
+print('IoU Accuracy: ', iou_scores.mean())
 print('IoU (Grayscale) Accuracy: ', iou_grayscale_scores.mean())
