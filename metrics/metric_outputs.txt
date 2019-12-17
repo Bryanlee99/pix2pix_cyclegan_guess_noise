@@ -158,3 +158,31 @@ IoU Accuracy:  0.0180089190968296
 IoU (Grayscale) Accuracy:  0.000322961674840167
 SN evaluated at default sigma: 10.969948871332367
 SN (Grayscale) evaluated at default sigma: 6.2742994996423525
+
+cycle_gan_guess_defense
+Images were normalized.
+
+RH Score:  2.405089945503938
+RH (Grayscale) Score:  -1.374805427936501
+Proposed RH Score:  49.45636846209784
+Proposed RH (Grayscale) Score:  -28.504200207721272
+Segmentation Accuracy:  0.22030044555664063
+Segmentation (Grayscale) Accuracy:  0.052121124267578124
+IoU Accuracy:  0.026780714171007792
+IoU (Grayscale) Accuracy:  0.001221778799060822
+SN evaluated at default sigma: 24.65357850044209
+SN (Grayscale) evaluated at default sigma: 14.168311693059989
+
+cycle_gan_noisy_defense
+Images were normalized.
+
+RH Score:  0.10090867832649089
+RH (Grayscale) Score:  -0.05998969581286877
+Proposed RH Score:  91.28831678043328
+Proposed RH (Grayscale) Score:  -52.824080839541
+Segmentation Accuracy:  0.02339375813802083
+Segmentation (Grayscale) Accuracy:  0.0029632568359375
+IoU Accuracy:  0.0029960787737811053
+IoU (Grayscale) Accuracy:  6.55475729359662e-05
+SN evaluated at default sigma: 5.602193660823085
+SN (Grayscale) evaluated at default sigma: 3.214570709356778
