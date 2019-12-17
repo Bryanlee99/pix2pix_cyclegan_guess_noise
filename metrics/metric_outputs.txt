@@ -144,3 +144,17 @@ IoU Accuracy:  0.06107872238812505
 IoU (Grayscale) Accuracy:  0.006378970089156454
 SN evaluated at default sigma: 47.57183914935725
 SN (Grayscale) evaluated at default sigma: 27.206764554292118
+
+cycle_gan_guess_noisy_AlB_defense
+Images were normalized.
+
+RH Score:  0.2179682118232437
+RH (Grayscale) Score:  -0.12848369563882145
+Proposed RH Score:  105.00060865182299
+Proposed RH (Grayscale) Score:  -58.79901353077058
+Segmentation Accuracy:  0.14652613321940103
+Segmentation (Grayscale) Accuracy:  0.014544677734375
+IoU Accuracy:  0.0180089190968296
+IoU (Grayscale) Accuracy:  0.000322961674840167
+SN evaluated at default sigma: 10.969948871332367
+SN (Grayscale) evaluated at default sigma: 6.2742994996423525
